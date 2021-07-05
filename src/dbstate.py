@@ -36,5 +36,5 @@ class StateDB:
 db: StateDB = StateDB()
 
 
-async def get_db() -> StateDB:
+def get_db() -> StateDB:
     return db
