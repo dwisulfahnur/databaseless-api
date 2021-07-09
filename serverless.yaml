@@ -1,0 +1,49 @@
+service: databaseless-api
+
+package:
+  individually: true
+
+provider:
+  name: aws
+  profile: ${opt:aws-profile, "default"}
+  runtime: python3.8
+  region: ap-southeast-1
+  stage: ${opt:stage, "dev"}
+  memorySize: 128
+  timeout: 120
+  iam:
+    role: ${opt:iamrole, 'arn:aws:iam::XXXXXXXXXXXX:role/LambdaExecutionRole'}
+
+plugins:
+  - serverless-python-requirements
+
+custom:
+  pythonRequirements:
+    dockerizePip: true
+    layer:
+      name: databaseless-api
+      path: .
+      description: Databaseless API Layer
+      compatibleRuntimes:
+        - python3.8
+
+functions:
+  app:
+    package:
+      patterns:
+        - 'src/**'
+        - '!requirements.txt'
+        - '!package.json'
+        - '!package-lock.json'
+        - '!.serverless/**'
+        - '!venv/**'
+        - '!node_modules/**'
+    handler: src.main.handler
+    environment:
+      STAGE: ${self:provider.stage}
+    layers:
+      - { Ref: PythonRequirementsLambdaLayer }
+    events:
+      - http:
+          method: any
+          path: /{proxy+}
