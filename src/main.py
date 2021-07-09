@@ -1,19 +1,20 @@
-from fastapi import FastAPI, HTTPException, status
+import os
 from typing import List
-
+from fastapi import FastAPI, HTTPException, status
 from fastapi.params import Depends
+from mangum import Mangum
 
 from src.serializers import ToDoInputSerializer, ToDoSerializer
 from src.dbstate import StateDB, get_db
 
 
-app = FastAPI(title='Databaseless ToDo API', docs_url='/')
+stage = os.environ.get('STAGE', None)
+openapi_prefix = f"/{stage}" if stage else "/"
+app = FastAPI(title='Databaseless ToDo API', openapi_prefix=openapi_prefix)
 
 
 @app.get('/todos', response_model=List[ToDoSerializer])
 def list_todo_api(db: StateDB = Depends(get_db)):
-    import time
-    time.sleep(10)
     return db.get_todos()
 
 
@@ -43,3 +44,6 @@ def finish_todo_api(id: str, db: StateDB = Depends(get_db)):
         status_code=status.HTTP_404_NOT_FOUND,
         detail='ToDo Not Found'
     )
+
+
+handler = Mangum(app)
