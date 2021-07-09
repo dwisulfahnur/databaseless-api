@@ -21,3 +21,31 @@ Install the requirements file
 
 ```uvicorn src.main:app --port 8000```
 
+
+## AWS Lambda Deployment with Serverless Framework
+
+### Install serverless
+
+```
+npm install -f serverless
+```
+
+### Install serverless plugins
+
+```
+npm install
+```
+
+### Run the deployment command
+
+Change the params with your own configurations
+
+region: the aws region
+aws-profile: your aws profile configured (unset: default)
+iamrole: Execution Role ([read how to create it](https://github.com/dwisulfahnur/databaseless-api/wiki/Create-Lambda-Execution-Role))
+
+
+```
+serverless deploy --region 'ap-southeast-1' --stage 'dev' --aws-profile 'sbrg' --iamrole 'arn:aws:iam::XXXXXXXXXXX:role/LambdaExecutionRole'
+```
+
